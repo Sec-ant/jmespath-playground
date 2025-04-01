@@ -1,0 +1,42 @@
+{
+  "name": "jmespath-playground",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lint": "^6.8.5",
+    "@jmespath-community/jmespath": "^1.1.5",
+    "@monaco-editor/react": "^4.7.0",
+    "@tailwindcss/vite": "^4.0.17",
+    "@uiw/codemirror-theme-vscode": "^4.23.10",
+    "@uiw/react-codemirror": "^4.23.10",
+    "@uiw/react-json-view": "2.0.0-alpha.30",
+    "codemirror-lang-jmespath": "^1.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.17",
+    "type-fest": "^4.38.0",
+    "valibot": "^1.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.23.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "typescript": "~5.8.2",
+    "typescript-eslint": "^8.28.0",
+    "vite": "^6.2.3"
+  },
+  "packageManager": "pnpm@10.7.0+sha512.6b865ad4b62a1d9842b61d674a393903b871d9244954f652b8842c2b553c72176b278f64c463e52d40fff8aba385c235c8c9ecf5cc7de4fd78b8bb6d49633ab6"
+}

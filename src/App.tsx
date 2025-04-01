@@ -6,6 +6,7 @@ import CodeMirror, {
   type ReactCodeMirrorProps,
 } from "@uiw/react-codemirror";
 import { vscodeLight } from "@uiw/codemirror-theme-vscode";
+import { placeholder } from "@uiw/react-codemirror";
 import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { type Diagnostic, linter } from "@codemirror/lint";
 import { search, compile, type JSONValue } from "@jmespath-community/jmespath";
@@ -20,6 +21,7 @@ const jsonExtensions = [
   linter(jsonParseLinter(), {
     delay: 0,
   }),
+  placeholder("Enter JSON here..."),
 ];
 
 function jmespathLinter() {
@@ -55,6 +57,7 @@ const jmespathExtensions = [
   linter(jmespathLinter(), {
     delay: 0,
   }),
+  placeholder("Enter JMESPath expression here..."),
 ];
 
 const App: FC = () => {

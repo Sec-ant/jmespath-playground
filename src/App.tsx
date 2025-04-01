@@ -1,14 +1,16 @@
-import JsonView from "@uiw/react-json-view";
-import { useMemo, useState, type FC, useCallback } from "react";
+import { useMemo, type FC, useCallback, memo } from "react";
+import { jmespath } from "codemirror-lang-jmespath";
+import { useShallow } from "zustand/shallow";
 import CodeMirror, {
-  EditorView,
+  type EditorView,
   type ReactCodeMirrorProps,
 } from "@uiw/react-codemirror";
-import { jmespath } from "codemirror-lang-jmespath";
-import { json, jsonParseLinter } from "@codemirror/lang-json";
-import { Diagnostic, linter } from "@codemirror/lint";
-import { search, compile, type JSONValue } from "@jmespath-community/jmespath";
 import { vscodeLight } from "@uiw/codemirror-theme-vscode";
+import { json, jsonParseLinter } from "@codemirror/lang-json";
+import { type Diagnostic, linter } from "@codemirror/lint";
+import { search, compile, type JSONValue } from "@jmespath-community/jmespath";
+import ExtendedJsonView from "./components/ExtendedJsonView";
+import { usePlaygroundStore } from "./store/playground";
 
 const INVALID_JSON = Symbol("INVALID_JSON");
 const INVALID_JMESPATH = Symbol("INVALID_JMESPATH");
@@ -56,63 +58,71 @@ const jmespathExtensions = [
 ];
 
 const App: FC = () => {
-  const [inputJsonStr, setInputJsonStr] = useState<string>("");
+  const { jsonStr, jmespathStr } = usePlaygroundStore(
+    useShallow(
+      useCallback(
+        ({ jsonStr, jmespathStr }) => ({
+          jsonStr: jsonStr,
+          jmespathStr: jmespathStr,
+        }),
+        []
+      )
+    )
+  );
 
   const handleInputJsonStrChange = useCallback<
     Exclude<ReactCodeMirrorProps["onChange"], undefined>
   >((value) => {
-    setInputJsonStr(value ?? "");
+    usePlaygroundStore.setState({ jsonStr: value ?? "" });
   }, []);
 
-  const inputJson = useMemo(() => {
+  const parsedJson = useMemo(() => {
     try {
-      return JSON.parse(inputJsonStr) as JSONValue;
+      return JSON.parse(jsonStr) as JSONValue;
     } catch (_) {
       return INVALID_JSON;
     }
-  }, [inputJsonStr]);
-
-  const [inputJmespathStr, setInputJmespathStr] = useState<string>("");
+  }, [jsonStr]);
 
   const handleInputJmespathStrChange = useCallback<
     Exclude<ReactCodeMirrorProps["onChange"], undefined>
   >((value) => {
-    setInputJmespathStr(value ?? "");
+    usePlaygroundStore.setState({ jmespathStr: value ?? "" });
   }, []);
 
-  const parsedJson = useMemo(() => {
-    if (inputJson === INVALID_JSON) {
+  const queriedJson = useMemo(() => {
+    if (parsedJson === INVALID_JSON) {
       return INVALID_JSON;
     }
 
-    if (inputJmespathStr === "") {
-      return inputJson;
+    if (jmespathStr === "") {
+      return parsedJson;
     }
 
     try {
-      const searchResult = search(inputJson, inputJmespathStr);
+      const searchResult = search(parsedJson, jmespathStr);
       return searchResult;
     } catch (_) {
-      console.log(_);
       return INVALID_JMESPATH;
     }
-  }, [inputJson, inputJmespathStr]);
+  }, [parsedJson, jmespathStr]);
 
-  const parsedJsonView = useMemo(() => {
-    if (typeof parsedJson === "symbol") {
-      return <span className="font-mono">{parsedJson.description}</span>;
+  const queriedJsonView = useMemo(() => {
+    if (typeof queriedJson === "symbol") {
+      return (
+        <span className="font-mono text-[rgb(221,17,17)]">
+          {queriedJson.description}
+        </span>
+      );
     }
-    if (typeof parsedJson === "object" && parsedJson !== null) {
-      return <JsonView value={parsedJson} />;
-    }
-    return <span className="font-mono">{JSON.stringify(parsedJson)}</span>;
-  }, [parsedJson]);
+    return <ExtendedJsonView value={queriedJson} />;
+  }, [queriedJson]);
 
   return (
     <div className="flex gap-2 p-2 h-screen bg-gray-200">
       <CodeMirror
         height="100%"
-        value={inputJsonStr}
+        value={jsonStr}
         theme={vscodeLight}
         onChange={handleInputJsonStrChange}
         extensions={jsonExtensions}
@@ -125,15 +135,15 @@ const App: FC = () => {
       <div className="flex flex-col gap-2 flex-grow">
         <CodeMirror
           height="100px"
-          value={inputJmespathStr}
+          value={jmespathStr}
           theme={vscodeLight}
           extensions={jmespathExtensions}
           onChange={handleInputJmespathStrChange}
         />
-        {parsedJsonView}
+        {queriedJsonView}
       </div>
     </div>
   );
 };
 
-export default App;
+export default memo(App);

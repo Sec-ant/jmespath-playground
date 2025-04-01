@@ -1,9 +1,30 @@
-import { memo, type RefCallback, useCallback, type FC } from "react";
+import { memo, type FC } from "react";
 import JsonView, { type JsonViewProps } from "@uiw/react-json-view";
 import { type JSONPrimitive } from "@jmespath-community/jmespath";
-import mergeRefs from "merge-refs";
+import styled from "styled-components";
 
-function assumeAs<T>(_: unknown): asserts _ is T {}
+const StyledJsonView = styled(JsonView)`
+  & {
+    --w-rjv-border-left-width: 0;
+  }
+
+  & > .w-rjv-wrap {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  & > :not(.w-rjv-wrap) {
+    display: none !important;
+  }
+
+  .w-rjv-object-key {
+    display: none !important;
+  }
+
+  .w-rjv-colon {
+    display: none !important;
+  }
+`;
 
 export interface PrimitiveViewProps<T extends JSONPrimitive>
   extends Omit<JsonViewProps<object>, "value"> {
@@ -12,37 +33,9 @@ export interface PrimitiveViewProps<T extends JSONPrimitive>
 
 const PrimitiveView: FC<PrimitiveViewProps<JSONPrimitive>> = ({
   value,
-  ref,
   ...restProps
 }) => {
-  const refCallback = useCallback<RefCallback<HTMLDivElement>>((node) => {
-    if (!node) {
-      return;
-    }
-    for (const child of node.children) {
-      if (child.tagName === "DIV" && child.classList.contains("w-rjv-wrap")) {
-        assumeAs<HTMLDivElement>(child);
-        child.style.removeProperty("border-left");
-        child.style.removeProperty("padding-left");
-        child.style.removeProperty("margin-left");
-
-        child
-          .querySelector("span:has(.w-rjv-object-key), .w-rjv-object-key")
-          ?.remove();
-        child.querySelector(".w-rjv-colon")?.remove();
-      } else {
-        child.remove();
-      }
-    }
-  }, []);
-
-  return (
-    <JsonView
-      ref={mergeRefs(ref, refCallback)}
-      value={[value]}
-      {...restProps}
-    />
-  );
+  return <StyledJsonView value={[value]} {...restProps} />;
 };
 
 export default memo(PrimitiveView);

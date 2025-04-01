@@ -18,9 +18,9 @@
     "@uiw/react-codemirror": "^4.23.10",
     "@uiw/react-json-view": "2.0.0-alpha.30",
     "codemirror-lang-jmespath": "^1.0.3",
-    "merge-refs": "^2.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "styled-components": "^6.1.16",
     "tailwindcss": "^4.0.17",
     "zustand": "^5.0.3"
   },

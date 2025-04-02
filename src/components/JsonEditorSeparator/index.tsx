@@ -26,7 +26,7 @@ const JsonEditorSeparator: FC = () => {
     ) {
       return;
     }
-    const dx = event.screenX - startXPositionRef.current;
+    const dx = event.clientX - startXPositionRef.current;
     usePlaygroundStore.setState({
       jsonEditorWidth: Math.max(
         jsonEditorWidthRef.current + dx,
@@ -45,7 +45,7 @@ const JsonEditorSeparator: FC = () => {
     (event) => {
       jsonEditorWidthRef.current =
         usePlaygroundStore.getState().jsonEditorWidth;
-      startXPositionRef.current = event.screenX;
+      startXPositionRef.current = event.clientX;
       setIsDragging(true);
     },
     []

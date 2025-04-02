@@ -1,12 +1,23 @@
-import { useMemo, type FC, useCallback, memo } from "react";
+import {
+  useMemo,
+  type FC,
+  useCallback,
+  memo,
+  type MouseEventHandler,
+  useRef,
+} from "react";
 import { jmespath } from "codemirror-lang-jmespath";
 import { useShallow } from "zustand/shallow";
-import CodeMirror, { type ReactCodeMirrorProps } from "@uiw/react-codemirror";
+import CodeMirror, {
+  type ReactCodeMirrorRef,
+  type ReactCodeMirrorProps,
+} from "@uiw/react-codemirror";
 import { vscodeLight } from "@uiw/codemirror-theme-vscode";
 import { placeholder } from "@uiw/react-codemirror";
 import { json } from "@codemirror/lang-json";
 import { linter } from "@codemirror/lint";
 import { search, type JSONValue } from "@jmespath-community/jmespath";
+import { syntaxTree } from "@codemirror/language";
 import ExtendedJsonView from "./components/ExtendedJsonView";
 import { usePlaygroundStore } from "./store/playground";
 import JsonEditorSeparator from "./components/JsonEditorSeparator";
@@ -113,16 +124,42 @@ const App: FC = () => {
     return <ExtendedJsonView value={queriedJson} />;
   }, [queriedJson]);
 
+  const jsonEditorRef = useRef<ReactCodeMirrorRef>(null);
+
+  const handleJsonEditorClick = useCallback<MouseEventHandler>((e) => {
+    const { view, view: { state } = {} } = jsonEditorRef.current ?? {};
+
+    if (!view || !state) {
+      return;
+    }
+
+    const { clientX, clientY } = e;
+
+    const pos = view.posAtCoords({ x: clientX, y: clientY });
+
+    if (!pos) {
+      return;
+    }
+
+    const tree = syntaxTree(state);
+
+    const treeCursor = tree.cursorAt(pos, 1);
+
+    console.log(treeCursor);
+  }, []);
+
   return (
     <div className="flex flex-col p-4 h-screen gap-2">
       <h1 className="shrink-0 text-xl font-bold">JMESPath Playground</h1>
       <div className="flex grow min-h-0">
         <div className="h-full shrink-0" style={{ width: jsonEditorWidth }}>
           <CodeMirror
+            ref={jsonEditorRef}
             height="100%"
             value={jsonStr}
             theme={vscodeLight}
             onChange={handleInputJsonStrChange}
+            onClick={handleJsonEditorClick}
             extensions={jsonExtensions}
             style={{
               height: "100%",

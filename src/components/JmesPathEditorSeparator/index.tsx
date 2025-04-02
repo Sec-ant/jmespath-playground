@@ -26,7 +26,7 @@ const JmesPathEditorSeparator: FC = () => {
     ) {
       return;
     }
-    const dy = event.screenY - startYPositionRef.current;
+    const dy = event.clientY - startYPositionRef.current;
     usePlaygroundStore.setState({
       jmespathEditorHeight: Math.max(
         JmesPathEditorHeightRef.current + dy,
@@ -45,7 +45,7 @@ const JmesPathEditorSeparator: FC = () => {
     (event) => {
       JmesPathEditorHeightRef.current =
         usePlaygroundStore.getState().jmespathEditorHeight;
-      startYPositionRef.current = event.screenY;
+      startYPositionRef.current = event.clientY;
       setIsDragging(true);
     },
     []

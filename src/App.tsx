@@ -1,58 +1,29 @@
 import { useMemo, type FC, useCallback, memo } from "react";
 import { jmespath } from "codemirror-lang-jmespath";
 import { useShallow } from "zustand/shallow";
-import CodeMirror, {
-  type EditorView,
-  type ReactCodeMirrorProps,
-} from "@uiw/react-codemirror";
+import CodeMirror, { type ReactCodeMirrorProps } from "@uiw/react-codemirror";
 import { vscodeLight } from "@uiw/codemirror-theme-vscode";
 import { placeholder } from "@uiw/react-codemirror";
-import { json, jsonParseLinter } from "@codemirror/lang-json";
-import { type Diagnostic, linter } from "@codemirror/lint";
-import { search, compile, type JSONValue } from "@jmespath-community/jmespath";
+import { json } from "@codemirror/lang-json";
+import { linter } from "@codemirror/lint";
+import { search, type JSONValue } from "@jmespath-community/jmespath";
 import ExtendedJsonView from "./components/ExtendedJsonView";
 import { usePlaygroundStore } from "./store/playground";
 import JsonEditorSeparator from "./components/JsonEditorSeparator";
 import JmesPathEditorSeparator from "./components/JmesPathEditorSeparator";
+import { jmespathLinter } from "./utils/jmespathLinter";
+import { jsonLinter } from "./utils/jsonLinter";
 
 const INVALID_JSON = Symbol("INVALID_JSON");
 const INVALID_JMESPATH = Symbol("INVALID_JMESPATH");
 
 const jsonExtensions = [
   json(),
-  linter(jsonParseLinter(), {
+  linter(jsonLinter(), {
     delay: 0,
   }),
   placeholder("Enter JSON here..."),
 ];
-
-function jmespathLinter() {
-  return (view: EditorView) => {
-    const diagnostics: Diagnostic[] = [];
-    const doc = view.state.doc;
-    const expression = doc.toString();
-    if (expression === "") {
-      return diagnostics;
-    }
-    try {
-      compile(expression);
-    } catch (e) {
-      const errorMessage =
-        e instanceof Error &&
-        (e.name === "ParserError" || e.name === "LexerError")
-          ? `${e.name}: ${e.message}`
-          : "Invalid JMESPath expression";
-
-      diagnostics.push({
-        from: 0,
-        to: expression.length,
-        severity: "error",
-        message: errorMessage,
-      });
-    }
-    return diagnostics;
-  };
-}
 
 const jmespathExtensions = [
   jmespath(),
@@ -90,6 +61,10 @@ const App: FC = () => {
   }, []);
 
   const parsedJson = useMemo(() => {
+    if (jsonStr === "") {
+      return null;
+    }
+
     try {
       return JSON.parse(jsonStr) as JSONValue;
     } catch (_) {

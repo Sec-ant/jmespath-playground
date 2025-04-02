@@ -12,6 +12,8 @@ import { type Diagnostic, linter } from "@codemirror/lint";
 import { search, compile, type JSONValue } from "@jmespath-community/jmespath";
 import ExtendedJsonView from "./components/ExtendedJsonView";
 import { usePlaygroundStore } from "./store/playground";
+import JsonEditorSeparator from "./components/JsonEditorSeparator";
+import JmesPathEditorSeparator from "./components/JmesPathEditorSeparator";
 
 const INVALID_JSON = Symbol("INVALID_JSON");
 const INVALID_JMESPATH = Symbol("INVALID_JMESPATH");
@@ -61,17 +63,25 @@ const jmespathExtensions = [
 ];
 
 const App: FC = () => {
-  const { jsonStr, jmespathStr } = usePlaygroundStore(
-    useShallow(
-      useCallback(
-        ({ jsonStr, jmespathStr }) => ({
-          jsonStr: jsonStr,
-          jmespathStr: jmespathStr,
-        }),
-        []
+  const { jsonStr, jmespathStr, jsonEditorWidth, jmespathEditorHeight } =
+    usePlaygroundStore(
+      useShallow(
+        useCallback(
+          ({
+            jsonStr,
+            jmespathStr,
+            jsonEditorWidth,
+            jmespathEditorHeight,
+          }) => ({
+            jsonStr,
+            jmespathStr,
+            jsonEditorWidth,
+            jmespathEditorHeight,
+          }),
+          []
+        )
       )
-    )
-  );
+    );
 
   const handleInputJsonStrChange = useCallback<
     Exclude<ReactCodeMirrorProps["onChange"], undefined>
@@ -113,7 +123,14 @@ const App: FC = () => {
   const queriedJsonView = useMemo(() => {
     if (typeof queriedJson === "symbol") {
       return (
-        <span className="font-mono text-[rgb(221,17,17)]">
+        <span
+          style={{
+            color: "#d11",
+            fontFamily: "var(--w-rjv-font-family, Menlo, monospace)",
+            fontSize: 13,
+            lineHeight: 1.4,
+          }}
+        >
           {queriedJson.description}
         </span>
       );
@@ -122,28 +139,43 @@ const App: FC = () => {
   }, [queriedJson]);
 
   return (
-    <div className="flex gap-2 p-2 h-screen bg-gray-200">
-      <CodeMirror
-        height="100%"
-        value={jsonStr}
-        theme={vscodeLight}
-        onChange={handleInputJsonStrChange}
-        extensions={jsonExtensions}
-        style={{
-          width: 400,
-          height: "100%",
-          borderRadius: 16,
-        }}
-      />
-      <div className="flex flex-col gap-2 flex-grow">
-        <CodeMirror
-          height="100px"
-          value={jmespathStr}
-          theme={vscodeLight}
-          extensions={jmespathExtensions}
-          onChange={handleInputJmespathStrChange}
-        />
-        {queriedJsonView}
+    <div className="flex flex-col p-4 h-screen gap-2">
+      <h1 className="shrink-0 text-xl font-bold">JMESPath Playground</h1>
+      <div className="flex grow min-h-0">
+        <div className="h-full shrink-0" style={{ width: jsonEditorWidth }}>
+          <CodeMirror
+            height="100%"
+            value={jsonStr}
+            theme={vscodeLight}
+            onChange={handleInputJsonStrChange}
+            extensions={jsonExtensions}
+            style={{
+              height: "100%",
+            }}
+          />
+        </div>
+        <JsonEditorSeparator />
+        <div className="flex flex-col flex-grow min-w-[400px] overflow-y-auto">
+          <div
+            className="w-full shrink-0"
+            style={{ height: jmespathEditorHeight }}
+          >
+            <CodeMirror
+              height="100%"
+              value={jmespathStr}
+              theme={vscodeLight}
+              extensions={jmespathExtensions}
+              onChange={handleInputJmespathStrChange}
+              style={{
+                height: "100%",
+              }}
+            />
+          </div>
+          <JmesPathEditorSeparator />
+          <div className="grow overflow-auto p-2 bg-gray-100 rounded-md min-h-[100px]">
+            {queriedJsonView}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+.cm-editor {
+  @apply rounded-md overflow-clip;
+}
+
+.cm-gutters,
+.cm-content {
+  font-size: 13px;
+}
+
+.cm-lineNumbers {
+  width: 32px;
+}

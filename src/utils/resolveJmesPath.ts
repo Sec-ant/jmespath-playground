@@ -21,7 +21,7 @@ import { type EditorView } from "@uiw/react-codemirror";
  * - "["
  * - "Array"
  */
-export function resolveJmesPath(node: SyntaxNode, view: EditorView) {
+export function resolveJmespath(node: SyntaxNode, view: EditorView) {
   const pathSegmentList: (string | number)[] = [];
 
   let currentNode: SyntaxNode | null | undefined = node;
@@ -95,10 +95,10 @@ export function resolveJmesPath(node: SyntaxNode, view: EditorView) {
     break;
   }
 
-  return joinJmesPath(pathSegmentList.reverse());
+  return joinJmespath(pathSegmentList.reverse());
 }
 
-export function joinJmesPath(pathSegmentList: (string | number)[]) {
+export function joinJmespath(pathSegmentList: (string | number)[]) {
   let result = "";
 
   for (let i = 0; i < pathSegmentList.length; ++i) {

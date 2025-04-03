@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+const STORE_NAME = "playground-store";
 export interface PlaygroundState {
   jsonStr: string;
   jmespathStr: string;
@@ -17,6 +18,6 @@ export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
 
 export const usePlaygroundStore = create<PlaygroundState>()(
   persist(() => INITIAL_PLAYGROUND_STATE, {
-    name: "playground-store",
+    name: STORE_NAME,
   })
 );

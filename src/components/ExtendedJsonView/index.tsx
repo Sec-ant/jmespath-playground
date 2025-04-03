@@ -1,6 +1,6 @@
-import { memo, type FC } from "react";
-import JsonView, { type JsonViewProps } from "@uiw/react-json-view";
 import { type JSONValue } from "@jmespath-community/jmespath";
+import JsonView, { type JsonViewProps } from "@uiw/react-json-view";
+import { memo, type FC } from "react";
 import PrimitiveView from "./components/PrimitiveView";
 
 export interface ExtendedJsonViewProps<T extends JSONValue>

@@ -1,6 +1,6 @@
-import { type EditorView } from "@uiw/react-codemirror";
 import { type Diagnostic } from "@codemirror/lint";
 import { compile } from "@jmespath-community/jmespath";
+import { type EditorView } from "@uiw/react-codemirror";
 
 export function jmespathLinter() {
   return (view: EditorView) => {

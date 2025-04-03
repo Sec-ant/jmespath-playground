@@ -1,17 +1,17 @@
 import {
-  type MouseEventHandler,
   type FC,
   memo,
+  type MouseEventHandler,
   useCallback,
   useEffect,
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import {
   INITIAL_PLAYGROUND_STATE,
   usePlaygroundStore,
 } from "../../store/playground";
-import { createPortal } from "react-dom";
 
 const JsonEditorSeparator: FC = () => {
   const [isDragging, setIsDragging] = useState(false);

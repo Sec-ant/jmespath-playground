@@ -1,7 +1,7 @@
 import { type Diagnostic } from "@codemirror/lint";
+import json from "@eslint/json";
 import { type EditorView } from "@uiw/react-codemirror";
 import { Linter } from "eslint-linter-browserify";
-import json from "@eslint/json";
 
 const linter = new Linter({
   cwd: "/",

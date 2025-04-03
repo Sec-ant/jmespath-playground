@@ -1,35 +1,35 @@
 import {
-  type MouseEventHandler,
-  type FC,
-  memo,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
+    type FC,
+    memo,
+    type MouseEventHandler,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
 } from "react";
-import {
-  INITIAL_PLAYGROUND_STATE,
-  usePlaygroundStore,
-} from "../../store/playground";
 import { createPortal } from "react-dom";
+import {
+    INITIAL_PLAYGROUND_STATE,
+    usePlaygroundStore,
+} from "../../store/playground";
 
-const JmesPathEditorSeparator: FC = () => {
+const JmespathEditorSeparator: FC = () => {
   const [isDragging, setIsDragging] = useState(false);
 
   const startYPositionRef = useRef(Number.NaN);
-  const JmesPathEditorHeightRef = useRef(Number.NaN);
+  const JmespathEditorHeightRef = useRef(Number.NaN);
 
   const handleMouseMove = useCallback((event: MouseEvent) => {
     if (
       Number.isNaN(startYPositionRef.current) ||
-      Number.isNaN(JmesPathEditorHeightRef.current)
+      Number.isNaN(JmespathEditorHeightRef.current)
     ) {
       return;
     }
     const dy = event.clientY - startYPositionRef.current;
     usePlaygroundStore.setState({
       jmespathEditorHeight: Math.max(
-        JmesPathEditorHeightRef.current + dy,
+        JmespathEditorHeightRef.current + dy,
         INITIAL_PLAYGROUND_STATE.jmespathEditorHeight
       ),
     });
@@ -37,13 +37,13 @@ const JmesPathEditorSeparator: FC = () => {
 
   const handleMouseUp = useCallback(() => {
     startYPositionRef.current = Number.NaN;
-    JmesPathEditorHeightRef.current = Number.NaN;
+    JmespathEditorHeightRef.current = Number.NaN;
     setIsDragging(false);
   }, []);
 
   const handleMouseDown = useCallback<MouseEventHandler<HTMLDivElement>>(
     (event) => {
-      JmesPathEditorHeightRef.current =
+      JmespathEditorHeightRef.current =
         usePlaygroundStore.getState().jmespathEditorHeight;
       startYPositionRef.current = event.clientY;
       setIsDragging(true);
@@ -77,4 +77,4 @@ const JmesPathEditorSeparator: FC = () => {
   );
 };
 
-export default memo(JmesPathEditorSeparator);
+export default memo(JmespathEditorSeparator);

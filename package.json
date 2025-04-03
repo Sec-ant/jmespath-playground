@@ -13,25 +13,29 @@
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/language": "^6.11.0",
     "@codemirror/lint": "^6.8.5",
+    "@codemirror/view": "^6.36.5",
     "@eslint/json": "^0.11.0",
     "@jmespath-community/jmespath": "^1.1.5",
     "@lezer/common": "^1.2.3",
-    "@tailwindcss/vite": "^4.0.17",
+    "@sec-ant/readable-stream": "^0.6.0",
+    "@tailwindcss/vite": "^4.1.1",
     "@uiw/codemirror-theme-vscode": "^4.23.10",
     "@uiw/react-codemirror": "^4.23.10",
     "@uiw/react-json-view": "2.0.0-alpha.30",
     "codemirror-lang-jmespath": "^1.0.3",
+    "core-js": "^3.41.0",
     "eslint-linter-browserify": "^9.23.0",
+    "prettier": "^3.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "styled-components": "^6.1.16",
-    "tailwindcss": "^4.0.17",
+    "styled-components": "^6.1.17",
+    "tailwindcss": "^4.1.1",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
-    "@types/react": "^19.0.12",
-    "@types/react-dom": "^19.0.4",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.1",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.23.0",
     "eslint-plugin-react-hooks": "^5.2.0",
@@ -39,7 +43,7 @@
     "globals": "^16.0.0",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.29.0",
-    "vite": "^6.2.4"
+    "vite": "^6.2.5"
   },
   "packageManager": "pnpm@10.7.1+sha512.2d92c86b7928dc8284f53494fb4201f983da65f0fb4f0d40baafa5cf628fa31dae3e5968f12466f17df7e97310e30f343a648baea1b9b350685dafafffdf5808"
 }

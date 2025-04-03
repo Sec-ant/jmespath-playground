@@ -1,6 +1,6 @@
-import { memo, type FC } from "react";
-import JsonView, { type JsonViewProps } from "@uiw/react-json-view";
 import { type JSONPrimitive } from "@jmespath-community/jmespath";
+import JsonView, { type JsonViewProps } from "@uiw/react-json-view";
+import { memo, type FC } from "react";
 import styled from "styled-components";
 
 const StyledJsonView = styled(JsonView)`

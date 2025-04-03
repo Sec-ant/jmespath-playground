@@ -24,13 +24,13 @@ import {
 } from "react";
 import { useShallow } from "zustand/shallow";
 import ExtendedJsonView from "./components/ExtendedJsonView";
-import JmespathEditorSeparator from "./components/JmespathEditorSeparator1";
+import JmespathEditorSeparator from "./components/JmespathEditorSeparator";
 import JsonEditorSeparator from "./components/JsonEditorSeparator";
 import { useHashStore, useHashStoreHydration } from "./store/hash";
 import { usePlaygroundStore } from "./store/playground";
 import { jmespathLinter } from "./utils/jmespathLinter";
 import { jsonLinter } from "./utils/jsonLinter";
-import { resolveJmespath } from "./utils/resolveJmespath1";
+import { resolveJmespath } from "./utils/resolveJmespath";
 
 const INVALID_JSON = Symbol("INVALID_JSON");
 const INVALID_JMESPATH = Symbol("INVALID_JMESPATH");

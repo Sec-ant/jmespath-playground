@@ -1,29 +1,30 @@
-import {
-  useMemo,
-  type FC,
-  useCallback,
-  memo,
-  type MouseEventHandler,
-  useRef,
-} from "react";
-import { jmespath } from "codemirror-lang-jmespath";
-import { useShallow } from "zustand/shallow";
-import CodeMirror, {
-  type ReactCodeMirrorRef,
-  type ReactCodeMirrorProps,
-} from "@uiw/react-codemirror";
-import { vscodeLight } from "@uiw/codemirror-theme-vscode";
-import { placeholder } from "@uiw/react-codemirror";
 import { json } from "@codemirror/lang-json";
+import { syntaxTree } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
 import { search, type JSONValue } from "@jmespath-community/jmespath";
-import { syntaxTree } from "@codemirror/language";
+import { vscodeLight } from "@uiw/codemirror-theme-vscode";
+import CodeMirror, {
+  placeholder,
+  type ReactCodeMirrorProps,
+  type ReactCodeMirrorRef,
+} from "@uiw/react-codemirror";
+import { jmespath } from "codemirror-lang-jmespath";
+import {
+  memo,
+  useCallback,
+  useMemo,
+  useRef,
+  type FC,
+  type MouseEventHandler,
+} from "react";
+import { useShallow } from "zustand/shallow";
 import ExtendedJsonView from "./components/ExtendedJsonView";
-import { usePlaygroundStore } from "./store/playground";
-import JsonEditorSeparator from "./components/JsonEditorSeparator";
 import JmesPathEditorSeparator from "./components/JmesPathEditorSeparator";
+import JsonEditorSeparator from "./components/JsonEditorSeparator";
+import { usePlaygroundStore } from "./store/playground";
 import { jmespathLinter } from "./utils/jmespathLinter";
 import { jsonLinter } from "./utils/jsonLinter";
+import { resolveJmesPath } from "./utils/resolveJmesPath";
 
 const INVALID_JSON = Symbol("INVALID_JSON");
 const INVALID_JMESPATH = Symbol("INVALID_JMESPATH");
@@ -143,9 +144,13 @@ const App: FC = () => {
 
     const tree = syntaxTree(state);
 
-    const treeCursor = tree.cursorAt(pos, 1);
+    const node = tree.resolve(pos, 1);
 
-    console.log(treeCursor);
+    const jmesPath = resolveJmesPath(node, view);
+
+    usePlaygroundStore.setState({
+      jmespathStr: jmesPath,
+    });
   }, []);
 
   return (

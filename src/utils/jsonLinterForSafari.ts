@@ -5,6 +5,9 @@ import { type EditorView } from "@codemirror/view";
 export function jsonLinterForSafari() {
   return (view: EditorView): Diagnostic[] => {
     const code = view.state.doc.toString();
+    if (code === "") {
+      return [];
+    }
     try {
       JSON.parse(code);
     } catch (e) {

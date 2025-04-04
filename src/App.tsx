@@ -34,8 +34,10 @@ import {
   usePlaygroundStore,
   type ArrayProjectionMode,
 } from "./store/playground";
+import { isSafari } from "./utils/isSafari";
 import { jmespathLinter } from "./utils/jmespathLinter";
 import { jsonLinter } from "./utils/jsonLinter";
+import { jsonLinterForSafari } from "./utils/jsonLinterForSafari";
 import { resolveJmespath } from "./utils/resolveJmespath";
 
 const INVALID_JSON = Symbol("INVALID_JSON");
@@ -78,7 +80,7 @@ const supportedKeymap = () =>
 const jsonExtensions = [
   supportedKeymap(),
   json(),
-  linter(jsonLinter(), {
+  linter(isSafari() ? jsonLinterForSafari() : jsonLinter(), {
     delay: 0,
   }),
   placeholder("Enter JSON here..."),

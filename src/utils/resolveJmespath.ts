@@ -1,5 +1,14 @@
 import { type SyntaxNode } from "@lezer/common";
 import { type EditorView } from "@uiw/react-codemirror";
+import { type ArrayProjectionMode } from "../store/playground";
+
+interface ResolveJmespathOptions {
+  arrayProjectionMode?: ArrayProjectionMode;
+}
+
+const defaultResolveJmespathOptions: Required<ResolveJmespathOptions> = {
+  arrayProjectionMode: "none",
+};
 
 /**
  * NodeTypes:
@@ -21,7 +30,16 @@ import { type EditorView } from "@uiw/react-codemirror";
  * - "["
  * - "Array"
  */
-export function resolveJmespath(node: SyntaxNode, view: EditorView) {
+export function resolveJmespath(
+  node: SyntaxNode,
+  view: EditorView,
+  options: ResolveJmespathOptions = {}
+) {
+  const resolvedOptions = {
+    ...defaultResolveJmespathOptions,
+    ...options,
+  };
+
   const pathSegmentList: (string | number)[] = [];
 
   let currentNode: SyntaxNode | null | undefined = node;
@@ -95,10 +113,16 @@ export function resolveJmespath(node: SyntaxNode, view: EditorView) {
     break;
   }
 
-  return joinJmespath(pathSegmentList.reverse());
+  return joinJmespath(
+    pathSegmentList.reverse(),
+    resolvedOptions.arrayProjectionMode
+  );
 }
 
-export function joinJmespath(pathSegmentList: (string | number)[]) {
+export function joinJmespath(
+  pathSegmentList: (string | number)[],
+  arrayProjectionMode: ArrayProjectionMode
+) {
   let result = "";
 
   for (let i = 0; i < pathSegmentList.length; ++i) {
@@ -110,7 +134,30 @@ export function joinJmespath(pathSegmentList: (string | number)[]) {
       }
       result += needsQuoting(segment) ? `"${segment}"` : segment;
     } else if (typeof segment === "number") {
-      result += `[${segment}]`;
+      switch (arrayProjectionMode) {
+        case "none":
+          result += `[${segment}]`;
+          break;
+        case "wildcard":
+          result += "[*]";
+          break;
+        case "slice to":
+          result += `[:${segment + 1}]`;
+          break;
+        case "slice from":
+          result += `[${segment}:]`;
+          break;
+        case "slice":
+          result += "[:]";
+          break;
+        case "flatten":
+          result += "[]";
+          break;
+        default:
+          arrayProjectionMode satisfies never;
+          result += `[${segment}]`;
+          break;
+      }
     } else {
       throw new TypeError(`Invalid path segment: ${segment}`);
     }

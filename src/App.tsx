@@ -19,6 +19,8 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
+  type ChangeEventHandler,
   type FC,
   type MouseEventHandler,
 } from "react";
@@ -27,7 +29,11 @@ import ExtendedJsonView from "./components/ExtendedJsonView";
 import JmespathEditorSeparator from "./components/JmespathEditorSeparator";
 import JsonEditorSeparator from "./components/JsonEditorSeparator";
 import { useHashStore, useHashStoreHydration } from "./store/hash";
-import { usePlaygroundStore } from "./store/playground";
+import {
+  ARRAY_PROJECTION_MODE_LIST,
+  usePlaygroundStore,
+  type ArrayProjectionMode,
+} from "./store/playground";
 import { jmespathLinter } from "./utils/jmespathLinter";
 import { jsonLinter } from "./utils/jsonLinter";
 import { resolveJmespath } from "./utils/resolveJmespath";
@@ -90,25 +96,35 @@ const jmespathExtensions = [
 const App: FC = () => {
   const hashHydrated = useHashStoreHydration();
 
-  const { jsonStr, jmespathStr, jsonEditorWidth, jmespathEditorHeight } =
-    usePlaygroundStore(
-      useShallow(
-        useCallback(
-          ({
-            jsonStr,
-            jmespathStr,
-            jsonEditorWidth,
-            jmespathEditorHeight,
-          }) => ({
-            jsonStr,
-            jmespathStr,
-            jsonEditorWidth,
-            jmespathEditorHeight,
-          }),
-          []
-        )
+  const {
+    jsonStr,
+    jmespathStr,
+    jsonEditorWidth,
+    jmespathEditorHeight,
+    updateJmespathByClick,
+    arrayProjectionMode,
+  } = usePlaygroundStore(
+    useShallow(
+      useCallback(
+        ({
+          jsonStr,
+          jmespathStr,
+          jsonEditorWidth,
+          jmespathEditorHeight,
+          updateJmespathByClick,
+          arrayProjectionMode,
+        }) => ({
+          jsonStr,
+          jmespathStr,
+          jsonEditorWidth,
+          jmespathEditorHeight,
+          updateJmespathByClick,
+          arrayProjectionMode,
+        }),
+        []
       )
-    );
+    )
+  );
 
   const updateStoreJsonStr = useCallback((value = "") => {
     useHashStore.setState({ jsonStr: value });
@@ -198,6 +214,13 @@ const App: FC = () => {
 
   const handleJsonEditorClick = useCallback<MouseEventHandler>(
     (e) => {
+      const { updateJmespathByClick, arrayProjectionMode } =
+        usePlaygroundStore.getState();
+
+      if (!updateJmespathByClick) {
+        return;
+      }
+
       const { view, view: { state } = {} } = jsonEditorRef.current ?? {};
       if (!view || !state) {
         return;
@@ -209,15 +232,110 @@ const App: FC = () => {
       }
       const tree = syntaxTree(state);
       const node = tree.resolve(pos, 1);
-      const jmespath = resolveJmespath(node, view);
+      const jmespath = resolveJmespath(node, view, {
+        arrayProjectionMode,
+      });
       updateStoreJmespathStr(jmespath);
     },
     [updateStoreJmespathStr]
   );
 
+  const handleUpdateJmespathByClickChange = useCallback<
+    ChangeEventHandler<HTMLInputElement>
+  >((e) => {
+    const { checked } = e.target;
+    usePlaygroundStore.setState({ updateJmespathByClick: checked });
+  }, []);
+
+  const handleArrayProjectionModeChange = useCallback<
+    ChangeEventHandler<HTMLSelectElement>
+  >((e) => {
+    const { value } = e.target;
+    usePlaygroundStore.setState({
+      arrayProjectionMode: value as ArrayProjectionMode,
+    });
+  }, []);
+
+  const [copyResult, setCopyResult] = useState("");
+
+  const showCopyResultTimeoutRef = useRef(0);
+  const [showCopyResult, setShowCopyResult] = useState(false);
+  useEffect(() => {
+    if (!showCopyResult) {
+      setCopyResult("");
+    }
+  }, [showCopyResult]);
+
+  const handleShareButtonClick = useCallback(() => {
+    navigator.clipboard
+      .writeText(window.location.href)
+      .then(() => {
+        setCopyResult("✅ Share link copied to clipboard");
+      })
+      .catch(() => {
+        setCopyResult("❌ Failed to copy share link");
+      })
+      .finally(() => {
+        clearTimeout(showCopyResultTimeoutRef.current);
+        setShowCopyResult(true);
+        showCopyResultTimeoutRef.current = setTimeout(() => {
+          setShowCopyResult(false);
+        }, 1000);
+      });
+  }, []);
+
   return (
-    <div className="flex flex-col p-4 h-screen gap-2">
-      <h1 className="shrink-0 text-xl font-bold">JMESPath Playground</h1>
+    <div className="flex flex-col p-4 p h-screen gap-2">
+      <h1 className="shrink-0 text-xl font-bold">🛝 JMESPath Playground</h1>
+      <div className="flex gap-4 shrink-0 items-center">
+        <div className="flex gap-2 shrink-0 items-center">
+          <input
+            className="cursor-pointer"
+            type="checkbox"
+            id="update-jmespath-by-click"
+            name="updateJmespathByClick"
+            checked={updateJmespathByClick}
+            onChange={handleUpdateJmespathByClickChange}
+          />
+          <label
+            className="cursor-pointer select-none"
+            htmlFor="update-jmespath-by-click"
+          >
+            Update JMESPath by click
+          </label>
+        </div>
+        <div className="flex gap-2 shrink-0 items-center">
+          <label
+            className="cursor-pointer select-none"
+            htmlFor="array-projection-mode"
+          >
+            Array projection mode
+          </label>
+          <select
+            className="cursor-pointer valid:bg-white valid:text-black bg-gray-100 text-gray-500 rounded-sm"
+            name="arrayProjectionMode"
+            id="array-projection-mode"
+            disabled={!updateJmespathByClick}
+            value={arrayProjectionMode}
+            onChange={handleArrayProjectionModeChange}
+          >
+            {ARRAY_PROJECTION_MODE_LIST.map((mode) => (
+              <option key={mode} value={mode}>
+                {mode}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          className="outline-1 outline-gray-400 bg-gray-100 px-2 rounded-sm cursor-pointer hover:bg-gray-200 active:bg-gray-300 transition-colors"
+          onClick={handleShareButtonClick}
+        >
+          Share
+        </button>
+        {showCopyResult && (
+          <span className="text-sm text-nowrap">{copyResult}</span>
+        )}
+      </div>
       <div className="flex grow min-h-0">
         <div className="h-full shrink-0" style={{ width: jsonEditorWidth }}>
           <CodeMirror
@@ -255,6 +373,20 @@ const App: FC = () => {
             {queriedJsonView}
           </div>
         </div>
+      </div>
+      <div className="flex gap-4 shrink-0 items-center justify-center text-sm">
+        <a
+          className="underline text-gray-600 cursor-pointer"
+          href="https://github.com/Sec-ant/jmespath-playground"
+        >
+          GitHub
+        </a>
+        <a
+          className="underline text-gray-600 cursor-pointer"
+          href="https://jmespath.org/tutorial.html"
+        >
+          JMESPath Tutorial
+        </a>
       </div>
     </div>
   );

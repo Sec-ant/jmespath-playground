@@ -19,7 +19,7 @@ export interface PlaygroundState {
   jmespathStr: string;
   jsonEditorWidth: number;
   jmespathEditorHeight: number;
-  updateJmespathByClick: boolean;
+  autoUpdateJmespath: boolean;
   arrayProjectionMode: ArrayProjectionMode;
 }
 
@@ -28,7 +28,7 @@ export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
   jmespathStr: "",
   jsonEditorWidth: 400,
   jmespathEditorHeight: 100,
-  updateJmespathByClick: true,
+  autoUpdateJmespath: true,
   arrayProjectionMode: "none",
 };
 

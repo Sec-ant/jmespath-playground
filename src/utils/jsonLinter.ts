@@ -40,7 +40,7 @@ export function jsonLinter() {
     );
 
     for (const lintMessage of lintMessages) {
-      const { line, column, endLine, endColumn, severity, message } =
+      const { line, column, endLine, endColumn, severity, message, ruleId } =
         lintMessage;
 
       const from = view.state.doc.line(line).from + column - 1;
@@ -52,7 +52,7 @@ export function jsonLinter() {
         to,
         message: message,
         severity: severity === 2 ? "error" : "warning",
-        source: "@eslint/json",
+        source: ruleId || "@eslint/json",
       });
     }
 

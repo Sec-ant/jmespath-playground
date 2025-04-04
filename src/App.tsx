@@ -1,5 +1,5 @@
 import { json } from "@codemirror/lang-json";
-import { language, syntaxTree } from "@codemirror/language";
+import { language } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
 import { keymap, type KeyBinding } from "@codemirror/view";
 import { search, type JSONValue } from "@jmespath-community/jmespath";
@@ -22,7 +22,6 @@ import {
   useState,
   type ChangeEventHandler,
   type FC,
-  type MouseEventHandler,
 } from "react";
 import { useShallow } from "zustand/shallow";
 import ExtendedJsonView from "./components/ExtendedJsonView";
@@ -34,6 +33,7 @@ import {
   usePlaygroundStore,
   type ArrayProjectionMode,
 } from "./store/playground";
+import { getSelectedNode } from "./utils/getSelectedNode";
 import { isSafari } from "./utils/isSafari";
 import { jmespathLinter } from "./utils/jmespathLinter";
 import { jsonLinter } from "./utils/jsonLinter";
@@ -103,7 +103,7 @@ const App: FC = () => {
     jmespathStr,
     jsonEditorWidth,
     jmespathEditorHeight,
-    updateJmespathByClick,
+    autoUpdateJmespath,
     arrayProjectionMode,
   } = usePlaygroundStore(
     useShallow(
@@ -113,14 +113,14 @@ const App: FC = () => {
           jmespathStr,
           jsonEditorWidth,
           jmespathEditorHeight,
-          updateJmespathByClick,
+          autoUpdateJmespath,
           arrayProjectionMode,
         }) => ({
           jsonStr,
           jmespathStr,
           jsonEditorWidth,
           jmespathEditorHeight,
-          updateJmespathByClick,
+          autoUpdateJmespath,
           arrayProjectionMode,
         }),
         []
@@ -214,29 +214,29 @@ const App: FC = () => {
 
   const jsonEditorRef = useRef<ReactCodeMirrorRef>(null);
 
-  const handleJsonEditorClick = useCallback<MouseEventHandler>(
-    (e) => {
-      const { updateJmespathByClick, arrayProjectionMode } =
+  const handleJsonEditorUpdate = useCallback<
+    Exclude<ReactCodeMirrorProps["onUpdate"], undefined>
+  >(
+    (viewUpdate) => {
+      if (!viewUpdate.selectionSet) {
+        return;
+      }
+
+      const { autoUpdateJmespath: updateJmespathByClick, arrayProjectionMode } =
         usePlaygroundStore.getState();
 
       if (!updateJmespathByClick) {
         return;
       }
 
-      const { view, view: { state } = {} } = jsonEditorRef.current ?? {};
-      if (!view || !state) {
-        return;
-      }
-      const { clientX, clientY } = e;
-      const pos = view.posAtCoords({ x: clientX, y: clientY });
-      if (!pos) {
-        return;
-      }
-      const tree = syntaxTree(state);
-      const node = tree.resolve(pos, 1);
-      const jmespath = resolveJmespath(node, view, {
+      const { state } = viewUpdate;
+
+      const node = getSelectedNode(state);
+
+      const jmespath = resolveJmespath(node, state, {
         arrayProjectionMode,
       });
+
       updateStoreJmespathStr(jmespath);
     },
     [updateStoreJmespathStr]
@@ -246,7 +246,7 @@ const App: FC = () => {
     ChangeEventHandler<HTMLInputElement>
   >((e) => {
     const { checked } = e.target;
-    usePlaygroundStore.setState({ updateJmespathByClick: checked });
+    usePlaygroundStore.setState({ autoUpdateJmespath: checked });
   }, []);
 
   const handleArrayProjectionModeChange = useCallback<
@@ -294,16 +294,16 @@ const App: FC = () => {
           <input
             className="cursor-pointer"
             type="checkbox"
-            id="update-jmespath-by-click"
-            name="updateJmespathByClick"
-            checked={updateJmespathByClick}
+            id="auto-update-jmespath"
+            name="autoUpdateJmespath"
+            checked={autoUpdateJmespath}
             onChange={handleUpdateJmespathByClickChange}
           />
           <label
             className="cursor-pointer select-none"
-            htmlFor="update-jmespath-by-click"
+            htmlFor="auto-update-jmespath"
           >
-            Update JMESPath by click
+            Auto update JMESPath
           </label>
         </div>
         <div className="flex gap-2 shrink-0 items-center">
@@ -317,7 +317,7 @@ const App: FC = () => {
             className="cursor-pointer valid:bg-white valid:text-black bg-gray-100 text-gray-500 rounded-sm"
             name="arrayProjectionMode"
             id="array-projection-mode"
-            disabled={!updateJmespathByClick}
+            disabled={!autoUpdateJmespath}
             value={arrayProjectionMode}
             onChange={handleArrayProjectionModeChange}
           >
@@ -346,7 +346,7 @@ const App: FC = () => {
             value={jsonStr}
             theme={vscodeLight}
             onChange={handleInputJsonStrChange}
-            onClick={handleJsonEditorClick}
+            onUpdate={handleJsonEditorUpdate}
             extensions={jsonExtensions}
             style={{
               height: "100%",

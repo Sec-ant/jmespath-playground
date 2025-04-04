@@ -1,5 +1,5 @@
 import { type SyntaxNode } from "@lezer/common";
-import { type EditorView } from "@uiw/react-codemirror";
+import { type EditorState } from "@uiw/react-codemirror";
 import { type ArrayProjectionMode } from "../store/playground";
 
 interface ResolveJmespathOptions {
@@ -32,7 +32,7 @@ const defaultResolveJmespathOptions: Required<ResolveJmespathOptions> = {
  */
 export function resolveJmespath(
   node: SyntaxNode,
-  view: EditorView,
+  state: EditorState,
   options: ResolveJmespathOptions = {}
 ) {
   const resolvedOptions = {
@@ -64,7 +64,7 @@ export function resolveJmespath(
     }
 
     if (currentNode.name === "PropertyName") {
-      const propertyName = view.state
+      const propertyName = state
         .sliceDoc(currentNode.from, currentNode.to)
         // remove quotes
         .replace(/^"|"$/g, "");
@@ -100,7 +100,7 @@ export function resolveJmespath(
       const propertyNameNode = currentNode.prevSibling?.prevSibling;
 
       if (propertyNameNode?.name === "PropertyName") {
-        const propertyName = view.state
+        const propertyName = state
           .sliceDoc(propertyNameNode.from, propertyNameNode.to)
           // remove quotes
           .replace(/^"|"$/g, "");

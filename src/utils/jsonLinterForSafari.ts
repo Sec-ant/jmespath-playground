@@ -16,9 +16,10 @@ export function jsonLinterForSafari() {
       return [
         {
           from,
+          to,
           message: e.message,
           severity: "error",
-          to,
+          source: "@codemirror/lang-json",
         },
       ];
     }

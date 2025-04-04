@@ -30,7 +30,7 @@ const JsonEditorSeparator: FC = () => {
     usePlaygroundStore.setState({
       jsonEditorWidth: Math.max(
         jsonEditorWidthRef.current + dx,
-        INITIAL_PLAYGROUND_STATE.jsonEditorWidth
+        INITIAL_PLAYGROUND_STATE.jsonEditorWidth,
       ),
     });
   }, []);
@@ -48,7 +48,7 @@ const JsonEditorSeparator: FC = () => {
       startXPositionRef.current = event.clientX;
       setIsDragging(true);
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -63,15 +63,15 @@ const JsonEditorSeparator: FC = () => {
   return (
     <>
       <div
-        className="h-full w-2 flex items-center justify-center cursor-col-resize hover:bg-gray-300 shrink-0"
+        className="flex h-full w-2 shrink-0 cursor-col-resize items-center justify-center hover:bg-gray-300"
         onMouseDown={handleMouseDown}
       >
-        <div className="h-8 w-1 bg-gray-400 rounded-full" />
+        <div className="h-8 w-1 rounded-full bg-gray-400" />
       </div>
       {isDragging &&
         createPortal(
-          <div className="fixed left-0 top-0 w-full h-full z-10 opacity-50 cursor-col-resize" />,
-          document.body
+          <div className="fixed top-0 left-0 z-10 h-full w-full cursor-col-resize opacity-50" />,
+          document.body,
         )}
     </>
   );

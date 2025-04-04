@@ -1,16 +1,16 @@
 import {
-    type FC,
-    memo,
-    type MouseEventHandler,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
+  type FC,
+  memo,
+  type MouseEventHandler,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
 } from "react";
 import { createPortal } from "react-dom";
 import {
-    INITIAL_PLAYGROUND_STATE,
-    usePlaygroundStore,
+  INITIAL_PLAYGROUND_STATE,
+  usePlaygroundStore,
 } from "../../store/playground";
 
 const JmespathEditorSeparator: FC = () => {
@@ -30,7 +30,7 @@ const JmespathEditorSeparator: FC = () => {
     usePlaygroundStore.setState({
       jmespathEditorHeight: Math.max(
         JmespathEditorHeightRef.current + dy,
-        INITIAL_PLAYGROUND_STATE.jmespathEditorHeight
+        INITIAL_PLAYGROUND_STATE.jmespathEditorHeight,
       ),
     });
   }, []);
@@ -48,7 +48,7 @@ const JmespathEditorSeparator: FC = () => {
       startYPositionRef.current = event.clientY;
       setIsDragging(true);
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -63,15 +63,15 @@ const JmespathEditorSeparator: FC = () => {
   return (
     <>
       <div
-        className="w-full h-2 flex items-center justify-center cursor-row-resize hover:bg-gray-300 shrink-0"
+        className="flex h-2 w-full shrink-0 cursor-row-resize items-center justify-center hover:bg-gray-300"
         onMouseDown={handleMouseDown}
       >
-        <div className="w-8 h-1 bg-gray-400 rounded-full" />
+        <div className="h-1 w-8 rounded-full bg-gray-400" />
       </div>
       {isDragging &&
         createPortal(
-          <div className="fixed left-0 top-0 w-full h-full z-10 opacity-50 cursor-row-resize" />,
-          document.body
+          <div className="fixed top-0 left-0 z-10 h-full w-full cursor-row-resize opacity-50" />,
+          document.body,
         )}
     </>
   );

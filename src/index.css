@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 .cm-editor {
-  @apply rounded-md overflow-clip;
+  @apply overflow-clip rounded-md;
 }
 
 .cm-gutters,

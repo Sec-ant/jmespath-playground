@@ -36,7 +36,7 @@ export function jsonLinter() {
       ],
       {
         filename: "code.json",
-      }
+      },
     );
 
     for (const lintMessage of lintMessages) {

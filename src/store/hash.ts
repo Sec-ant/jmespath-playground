@@ -52,7 +52,7 @@ const hashStateStorage: PersistStorage<HashState> = {
     window.history.replaceState(
       null,
       "",
-      `${window.location.pathname}#${searchParams.toString()}`
+      `${window.location.pathname}#${searchParams.toString()}`,
     );
   },
 
@@ -62,7 +62,7 @@ const hashStateStorage: PersistStorage<HashState> = {
     window.history.replaceState(
       null,
       "",
-      `${window.location.pathname}#${searchParams.toString()}`
+      `${window.location.pathname}#${searchParams.toString()}`,
     );
   },
 };
@@ -95,7 +95,7 @@ export const useHashStore = create<HashState>()(
         }
       };
     },
-  })
+  }),
 );
 
 export function useHashStoreHydration() {
@@ -103,7 +103,7 @@ export function useHashStoreHydration() {
 
   useEffect(() => {
     const unsubHydrate = useHashStore.persist.onHydrate(() =>
-      setHydrated(false)
+      setHydrated(false),
     );
 
     const unsubFinishHydration = useHashStore.persist.onFinishHydration(() => {

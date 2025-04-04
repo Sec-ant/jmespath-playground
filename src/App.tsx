@@ -29,9 +29,9 @@ import JmespathEditorSeparator from "./components/JmespathEditorSeparator";
 import JsonEditorSeparator from "./components/JsonEditorSeparator";
 import { useHashStore, useHashStoreHydration } from "./store/hash";
 import {
-  ARRAY_PROJECTION_MODE_LIST,
+  ARRAY_PROJECTION_LIST,
   usePlaygroundStore,
-  type ArrayProjectionMode,
+  type ArrayProjection,
 } from "./store/playground";
 import { getSelectedNode } from "./utils/getSelectedNode";
 import { isSafari } from "./utils/isSafari";
@@ -104,7 +104,7 @@ const App: FC = () => {
     jsonEditorWidth,
     jmespathEditorHeight,
     autoUpdateJmespath,
-    arrayProjectionMode,
+    arrayProjection,
   } = usePlaygroundStore(
     useShallow(
       useCallback(
@@ -114,18 +114,18 @@ const App: FC = () => {
           jsonEditorWidth,
           jmespathEditorHeight,
           autoUpdateJmespath,
-          arrayProjectionMode,
+          arrayProjection,
         }) => ({
           jsonStr,
           jmespathStr,
           jsonEditorWidth,
           jmespathEditorHeight,
           autoUpdateJmespath,
-          arrayProjectionMode,
+          arrayProjection,
         }),
-        []
-      )
-    )
+        [],
+      ),
+    ),
   );
 
   const updateStoreJsonStr = useCallback((value = "") => {
@@ -153,7 +153,7 @@ const App: FC = () => {
     (value) => {
       updateStoreJsonStr(value);
     },
-    [updateStoreJsonStr]
+    [updateStoreJsonStr],
   );
 
   const parsedJson = useMemo(() => {
@@ -174,7 +174,7 @@ const App: FC = () => {
     (value) => {
       updateStoreJmespathStr(value);
     },
-    [updateStoreJmespathStr]
+    [updateStoreJmespathStr],
   );
 
   const queriedJson = useMemo(() => {
@@ -222,7 +222,7 @@ const App: FC = () => {
         return;
       }
 
-      const { autoUpdateJmespath: updateJmespathByClick, arrayProjectionMode } =
+      const { autoUpdateJmespath: updateJmespathByClick, arrayProjection } =
         usePlaygroundStore.getState();
 
       if (!updateJmespathByClick) {
@@ -234,12 +234,12 @@ const App: FC = () => {
       const node = getSelectedNode(state);
 
       const jmespath = resolveJmespath(node, state, {
-        arrayProjectionMode,
+        arrayProjection,
       });
 
       updateStoreJmespathStr(jmespath);
     },
-    [updateStoreJmespathStr]
+    [updateStoreJmespathStr],
   );
 
   const handleUpdateJmespathByClickChange = useCallback<
@@ -249,14 +249,26 @@ const App: FC = () => {
     usePlaygroundStore.setState({ autoUpdateJmespath: checked });
   }, []);
 
-  const handleArrayProjectionModeChange = useCallback<
+  const handleArrayProjectionChange = useCallback<
     ChangeEventHandler<HTMLSelectElement>
   >((e) => {
     const { value } = e.target;
     usePlaygroundStore.setState({
-      arrayProjectionMode: value as ArrayProjectionMode,
+      arrayProjection: value as ArrayProjection,
     });
   }, []);
+
+  useEffect(() => {
+    const { state } = jsonEditorRef.current?.view ?? {};
+    if (!state) {
+      return;
+    }
+    const node = getSelectedNode(state);
+    const jmespath = resolveJmespath(node, state, {
+      arrayProjection,
+    });
+    updateStoreJmespathStr(jmespath);
+  }, [arrayProjection, updateStoreJmespathStr]);
 
   const [copyResult, setCopyResult] = useState("");
 
@@ -287,10 +299,10 @@ const App: FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col p-4 p h-screen gap-2">
+    <div className="p flex h-screen flex-col gap-2 p-4">
       <h1 className="shrink-0 text-xl font-bold">🛝 JMESPath Playground</h1>
-      <div className="flex gap-4 shrink-0 items-center">
-        <div className="flex gap-2 shrink-0 items-center">
+      <div className="flex shrink-0 items-center gap-4">
+        <div className="flex shrink-0 items-center gap-2">
           <input
             className="cursor-pointer"
             type="checkbox"
@@ -306,22 +318,22 @@ const App: FC = () => {
             Auto update JMESPath
           </label>
         </div>
-        <div className="flex gap-2 shrink-0 items-center">
+        <div className="flex shrink-0 items-center gap-2">
           <label
             className="cursor-pointer select-none"
-            htmlFor="array-projection-mode"
+            htmlFor="array-projection"
           >
-            Array projection mode
+            Array projection
           </label>
           <select
-            className="cursor-pointer valid:bg-white valid:text-black bg-gray-100 text-gray-500 rounded-sm"
-            name="arrayProjectionMode"
-            id="array-projection-mode"
+            className="cursor-pointer rounded-sm bg-gray-100 px-1 text-gray-500 valid:bg-white valid:text-black"
+            name="arrayProjection"
+            id="array-projection"
             disabled={!autoUpdateJmespath}
-            value={arrayProjectionMode}
-            onChange={handleArrayProjectionModeChange}
+            value={arrayProjection}
+            onChange={handleArrayProjectionChange}
           >
-            {ARRAY_PROJECTION_MODE_LIST.map((mode) => (
+            {ARRAY_PROJECTION_LIST.map((mode) => (
               <option key={mode} value={mode}>
                 {mode}
               </option>
@@ -329,7 +341,7 @@ const App: FC = () => {
           </select>
         </div>
         <button
-          className="outline-1 outline-gray-400 bg-gray-100 px-2 rounded-sm cursor-pointer hover:bg-gray-200 active:bg-gray-300 transition-colors"
+          className="cursor-pointer rounded-sm bg-gray-100 px-2 outline-1 outline-gray-400 transition-colors hover:bg-gray-200 active:bg-gray-300"
           onClick={handleShareButtonClick}
         >
           Share
@@ -338,7 +350,7 @@ const App: FC = () => {
           <span className="text-sm text-nowrap">{copyResult}</span>
         )}
       </div>
-      <div className="flex grow min-h-0">
+      <div className="flex min-h-0 grow">
         <div className="h-full shrink-0" style={{ width: jsonEditorWidth }}>
           <CodeMirror
             ref={jsonEditorRef}
@@ -354,7 +366,7 @@ const App: FC = () => {
           />
         </div>
         <JsonEditorSeparator />
-        <div className="flex flex-col flex-grow min-w-[400px] overflow-y-auto">
+        <div className="flex min-w-[400px] flex-grow flex-col overflow-y-auto">
           <div
             className="w-full shrink-0"
             style={{ height: jmespathEditorHeight }}
@@ -371,20 +383,20 @@ const App: FC = () => {
             />
           </div>
           <JmespathEditorSeparator />
-          <div className="grow overflow-auto p-2 bg-gray-100 rounded-md min-h-[100px]">
+          <div className="min-h-[100px] grow overflow-auto rounded-md bg-gray-100 p-2">
             {queriedJsonView}
           </div>
         </div>
       </div>
-      <div className="flex gap-4 shrink-0 items-center justify-center text-sm">
+      <div className="flex shrink-0 items-center justify-center gap-4 text-sm">
         <a
-          className="underline text-gray-600 cursor-pointer"
+          className="cursor-pointer text-gray-600 underline"
           href="https://github.com/Sec-ant/jmespath-playground"
         >
           GitHub
         </a>
         <a
-          className="underline text-gray-600 cursor-pointer"
+          className="cursor-pointer text-gray-600 underline"
           href="https://jmespath.org/tutorial.html"
         >
           JMESPath Tutorial

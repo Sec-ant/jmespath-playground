@@ -2,7 +2,7 @@ import { type SyntaxNode } from "@lezer/common";
 
 export function getCommonAncestorNode(
   node1: SyntaxNode,
-  node2: SyntaxNode
+  node2: SyntaxNode,
 ): SyntaxNode | null {
   const ancestors1 = getAncestors(node1);
   const ancestors2 = getAncestors(node2);

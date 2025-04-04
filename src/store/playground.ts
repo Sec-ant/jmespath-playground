@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 const STORE_NAME = "playground-store";
 
-export const ARRAY_PROJECTION_MODE_LIST = [
+export const ARRAY_PROJECTION_LIST = [
   "none",
   "wildcard",
   "slice to",
@@ -12,7 +12,7 @@ export const ARRAY_PROJECTION_MODE_LIST = [
   "flatten",
 ] as const;
 
-export type ArrayProjectionMode = (typeof ARRAY_PROJECTION_MODE_LIST)[number];
+export type ArrayProjection = (typeof ARRAY_PROJECTION_LIST)[number];
 
 export interface PlaygroundState {
   jsonStr: string;
@@ -20,7 +20,7 @@ export interface PlaygroundState {
   jsonEditorWidth: number;
   jmespathEditorHeight: number;
   autoUpdateJmespath: boolean;
-  arrayProjectionMode: ArrayProjectionMode;
+  arrayProjection: ArrayProjection;
 }
 
 export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
@@ -29,11 +29,11 @@ export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
   jsonEditorWidth: 400,
   jmespathEditorHeight: 100,
   autoUpdateJmespath: true,
-  arrayProjectionMode: "none",
+  arrayProjection: "none",
 };
 
 export const usePlaygroundStore = create<PlaygroundState>()(
   persist(() => INITIAL_PLAYGROUND_STATE, {
     name: STORE_NAME,
-  })
+  }),
 );

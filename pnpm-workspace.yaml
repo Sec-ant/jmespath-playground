@@ -3,3 +3,4 @@ onlyBuiltDependencies:
   - core-js-pure
   - esbuild
   - msgpackr-extract
+  - simple-git-hooks

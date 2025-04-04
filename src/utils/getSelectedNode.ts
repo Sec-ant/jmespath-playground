@@ -22,7 +22,7 @@ export function getSelectedNode(state: EditorState): SyntaxNode {
     } else {
       const commonAncestorNode = getCommonAncestorNode(
         startWithNode,
-        endWithNode
+        endWithNode,
       );
       if (commonAncestorNode === startWithNode) {
         node = endWithNode;

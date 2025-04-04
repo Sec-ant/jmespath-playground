@@ -1,13 +1,13 @@
 import { type SyntaxNode } from "@lezer/common";
 import { type EditorState } from "@uiw/react-codemirror";
-import { type ArrayProjectionMode } from "../store/playground";
+import { type ArrayProjection } from "../store/playground";
 
 interface ResolveJmespathOptions {
-  arrayProjectionMode?: ArrayProjectionMode;
+  arrayProjection?: ArrayProjection;
 }
 
 const defaultResolveJmespathOptions: Required<ResolveJmespathOptions> = {
-  arrayProjectionMode: "none",
+  arrayProjection: "none",
 };
 
 /**
@@ -33,7 +33,7 @@ const defaultResolveJmespathOptions: Required<ResolveJmespathOptions> = {
 export function resolveJmespath(
   node: SyntaxNode,
   state: EditorState,
-  options: ResolveJmespathOptions = {}
+  options: ResolveJmespathOptions = {},
 ) {
   const resolvedOptions = {
     ...defaultResolveJmespathOptions,
@@ -115,13 +115,13 @@ export function resolveJmespath(
 
   return joinJmespath(
     pathSegmentList.reverse(),
-    resolvedOptions.arrayProjectionMode
+    resolvedOptions.arrayProjection,
   );
 }
 
 export function joinJmespath(
   pathSegmentList: (string | number)[],
-  arrayProjectionMode: ArrayProjectionMode
+  arrayProjection: ArrayProjection,
 ) {
   let result = "";
 
@@ -134,7 +134,7 @@ export function joinJmespath(
       }
       result += needsQuoting(segment) ? `"${segment}"` : segment;
     } else if (typeof segment === "number") {
-      switch (arrayProjectionMode) {
+      switch (arrayProjection) {
         case "none":
           result += `[${segment}]`;
           break;
@@ -154,7 +154,7 @@ export function joinJmespath(
           result += "[]";
           break;
         default:
-          arrayProjectionMode satisfies never;
+          arrayProjection satisfies never;
           result += `[${segment}]`;
           break;
       }

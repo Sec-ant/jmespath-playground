@@ -9,19 +9,20 @@ declare global {
      * @returns The base64 encoded string representation of the Uint8Array
      */
     toBase64(options?: {
-      alphabet?: 'base64' | 'base64url';
+      alphabet?: "base64" | "base64url";
       omitPadding?: boolean;
     }): string;
   }
 }
 
-
 export async function encode(value: JSONValue) {
   const source = JSON.stringify(value);
-  const textEncoderStream = new TextEncoderStream()
+  const textEncoderStream = new TextEncoderStream();
   const compressionStream = new CompressionStream("gzip");
-  const compressed = fromAnyIterable(source).pipeThrough(textEncoderStream).pipeThrough(compressionStream);
-  const bytes = await new Response(compressed).bytes()
+  const compressed = fromAnyIterable(source)
+    .pipeThrough(textEncoderStream)
+    .pipeThrough(compressionStream);
+  const bytes = await new Response(compressed).bytes();
   return bytes.toBase64({
     omitPadding: true,
   });

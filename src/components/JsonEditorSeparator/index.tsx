@@ -63,7 +63,7 @@ const JsonEditorSeparator: FC = () => {
   return (
     <>
       <div
-        className="flex h-full w-2 shrink-0 cursor-col-resize items-center justify-center hover:bg-gray-300"
+        className="flex h-full w-2 shrink-0 cursor-col-resize items-center justify-center hover:bg-gray-300 hover:mask-y-from-[calc(100%-32px)] hover:mask-y-to-100%"
         onMouseDown={handleMouseDown}
       >
         <div className="h-8 w-1 rounded-full bg-gray-400" />

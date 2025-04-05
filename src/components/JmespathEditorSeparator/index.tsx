@@ -63,7 +63,7 @@ const JmespathEditorSeparator: FC = () => {
   return (
     <>
       <div
-        className="flex h-2 w-full shrink-0 cursor-row-resize items-center justify-center hover:bg-gray-300"
+        className="flex h-2 w-full shrink-0 cursor-row-resize items-center justify-center hover:bg-gray-300 hover:mask-x-from-[calc(100%-32px)] hover:mask-x-to-100%"
         onMouseDown={handleMouseDown}
       >
         <div className="h-1 w-8 rounded-full bg-gray-400" />

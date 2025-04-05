@@ -392,7 +392,7 @@ const App: FC = () => {
   }, [captureModS]);
 
   return (
-    <div className="p flex h-screen min-w-fit flex-col gap-2 p-4">
+    <div className="p flex h-screen flex-col gap-2 p-4">
       <h1 className="shrink-0 text-xl font-bold">🛝 JMESPath Playground</h1>
       <div className="flex shrink-0 items-center gap-4">
         <div className="flex shrink-0 items-center gap-2">
@@ -443,7 +443,7 @@ const App: FC = () => {
           <span className="text-sm text-nowrap">{copyResult}</span>
         )}
       </div>
-      <div className="flex min-h-0 grow">
+      <div className="flex min-h-0 grow overflow-x-auto">
         <div className="h-full shrink-0" style={{ width: jsonEditorWidth }}>
           <CodeMirror
             ref={jsonEditorRef}

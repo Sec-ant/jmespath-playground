@@ -40,9 +40,21 @@ import { jsonLinter } from "./utils/jsonLinter";
 import { jsonLinterForSafari } from "./utils/jsonLinterForSafari";
 import { resolveJmespath } from "./utils/resolveJmespath";
 
+/**
+ * Symbol indicating invalid JSON input
+ */
 const INVALID_JSON = Symbol("INVALID_JSON");
+
+/**
+ * Symbol indicating invalid JMESPath expression
+ */
 const INVALID_JMESPATH = Symbol("INVALID_JMESPATH");
 
+/**
+ * Creates keyboard shortcuts for CodeMirror
+ * Currently provides Shift-Alt-F for JSON formatting
+ * @returns A keymap extension for CodeMirror
+ */
 const supportedKeymap = () =>
   keymap.of([
     {
@@ -77,6 +89,10 @@ const supportedKeymap = () =>
     },
   ] satisfies KeyBinding[]);
 
+/**
+ * Extensions for the JSON editor
+ * Includes syntax highlighting, linting, keyboard shortcuts and placeholder text
+ */
 const jsonExtensions = [
   supportedKeymap(),
   json(),
@@ -86,6 +102,10 @@ const jsonExtensions = [
   placeholder("Enter JSON here..."),
 ];
 
+/**
+ * Extensions for the JMESPath editor
+ * Includes syntax highlighting, linting, keyboard shortcuts and placeholder text
+ */
 const jmespathExtensions = [
   supportedKeymap(),
   jmespath(),
@@ -95,6 +115,21 @@ const jmespathExtensions = [
   placeholder("Enter JMESPath expression here..."),
 ];
 
+/**
+ * JMESPath Playground Application
+ *
+ * A web-based tool for writing and testing JMESPath expressions against JSON data.
+ * Features:
+ * - Syntax highlighting for both JSON and JMESPath
+ * - Real-time evaluation of JMESPath expressions
+ * - Error reporting for invalid JSON or JMESPath
+ * - Auto-generation of JMESPath expressions based on JSON selection
+ * - Configurable array projection behavior
+ * - Sharing functionality via URL
+ * - Resizable editor panels
+ *
+ * @returns The JMESPath Playground UI
+ */
 const App: FC = () => {
   const hashHydrated = useHashStoreHydration();
 
@@ -128,11 +163,19 @@ const App: FC = () => {
     ),
   );
 
+  /**
+   * Updates the JSON string in both hash store and playground store
+   * @param value - The new JSON string value
+   */
   const updateStoreJsonStr = useCallback((value = "") => {
     useHashStore.setState({ jsonStr: value });
     usePlaygroundStore.setState({ jsonStr: value });
   }, []);
 
+  /**
+   * Updates the JMESPath string in both hash store and playground store
+   * @param value - The new JMESPath string value
+   */
   const updateStoreJmespathStr = useCallback((value = "") => {
     useHashStore.setState({ jmespathStr: value });
     usePlaygroundStore.setState({ jmespathStr: value });
@@ -156,6 +199,10 @@ const App: FC = () => {
     [updateStoreJsonStr],
   );
 
+  /**
+   * Parses the current JSON string and returns the parsed object
+   * Returns INVALID_JSON symbol if parsing fails
+   */
   const parsedJson = useMemo(() => {
     if (jsonStr === "") {
       return null;
@@ -180,6 +227,10 @@ const App: FC = () => {
     [updateStoreJmespathStr],
   );
 
+  /**
+   * Applies the current JMESPath expression to the parsed JSON
+   * Returns INVALID_JMESPATH symbol if expression is invalid
+   */
   const queriedJson = useMemo(() => {
     if (parsedJson === INVALID_JSON) {
       return INVALID_JSON;
@@ -217,6 +268,10 @@ const App: FC = () => {
 
   const jsonEditorRef = useRef<ReactCodeMirrorRef>(null);
 
+  /**
+   * Handles JSON editor selection changes
+   * Automatically generates JMESPath expressions based on selection when enabled
+   */
   const handleJsonEditorUpdate = useCallback<
     Exclude<ReactCodeMirrorProps["onUpdate"], undefined>
   >(
@@ -282,7 +337,11 @@ const App: FC = () => {
     }
   }, [showCopyResult]);
 
-  const handleShareButtonClick = useCallback(() => {
+  /**
+   * Creates a shareable URL and copies it to clipboard
+   * Shows a success or error message after attempt
+   */
+  const copyShareLinkToClipboard = useCallback(() => {
     navigator.clipboard
       .writeText(window.location.href)
       .then(() => {
@@ -299,6 +358,38 @@ const App: FC = () => {
         }, 1000);
       });
   }, []);
+
+  /**
+   * Captures the Mod+S keyboard shortcut and calls copyShareLinkToClipboard
+   * @param e - The keyboard event
+   */
+  const captureModS = useCallback(
+    (e: KeyboardEvent) => {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        !(e.altKey || e.shiftKey) &&
+        e.key === "s"
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        copyShareLinkToClipboard();
+      }
+    },
+    [copyShareLinkToClipboard],
+  );
+
+  /**
+   * Adds a keydown event listener to capture the Mod+S keyboard shortcut
+   * Removes the event listener when the component unmounts
+   * @param captureModS - The callback function to handle the keyboard event
+   * @returns A cleanup function to remove the event listener
+   */
+  useEffect(() => {
+    window.addEventListener("keydown", captureModS);
+    return () => {
+      window.removeEventListener("keydown", captureModS);
+    };
+  }, [captureModS]);
 
   return (
     <div className="p flex h-screen min-w-fit flex-col gap-2 p-4">
@@ -344,7 +435,7 @@ const App: FC = () => {
         </div>
         <button
           className="cursor-pointer rounded-sm bg-gray-100 px-2 outline-1 outline-gray-400 transition-colors hover:bg-gray-200 active:bg-gray-300"
-          onClick={handleShareButtonClick}
+          onClick={copyShareLinkToClipboard}
         >
           Share
         </button>

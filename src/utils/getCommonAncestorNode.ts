@@ -11,13 +11,13 @@ export function getCommonAncestorNode(
     return null;
   }
 
-  for (let i = 0; i < ancestors1.length; i++) {
+  for (let i = 0; i < ancestors1.length; ++i) {
     if (ancestors1[i] !== ancestors2[i]) {
       return ancestors1[i - 1]!;
     }
   }
 
-  return null;
+  return ancestors1[ancestors1.length - 1] ?? null;
 }
 
 function getAncestors(node: SyntaxNode): SyntaxNode[] {

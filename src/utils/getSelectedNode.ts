@@ -26,8 +26,15 @@ export function getSelectedNode(state: EditorState): SyntaxNode {
       );
       if (commonAncestorNode === startWithNode) {
         node = endWithNode;
-      } else {
+      } else if (commonAncestorNode === endWithNode) {
         node = startWithNode;
+      } else {
+        // TODO: this is not very graceful, but it works for now
+        if ([",", "⚠"].includes(startWithNode.name)) {
+          node = endWithNode;
+        } else {
+          node = startWithNode;
+        }
       }
     }
   } else {

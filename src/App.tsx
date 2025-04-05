@@ -168,11 +168,14 @@ const App: FC = () => {
     }
   }, [jsonStr]);
 
+  const isJmespathManuallyUpdatedRef = useRef(true);
+
   const handleInputJmespathStrChange = useCallback<
     Exclude<ReactCodeMirrorProps["onChange"], undefined>
   >(
     (value) => {
       updateStoreJmespathStr(value);
+      isJmespathManuallyUpdatedRef.current = true;
     },
     [updateStoreJmespathStr],
   );
@@ -221,23 +224,18 @@ const App: FC = () => {
       if (!viewUpdate.selectionSet) {
         return;
       }
-
       const { autoUpdateJmespath: updateJmespathByClick, arrayProjection } =
         usePlaygroundStore.getState();
-
       if (!updateJmespathByClick) {
         return;
       }
-
       const { state } = viewUpdate;
-
       const node = getSelectedNode(state);
-
       const jmespath = resolveJmespath(node, state, {
         arrayProjection,
       });
-
       updateStoreJmespathStr(jmespath);
+      isJmespathManuallyUpdatedRef.current = false;
     },
     [updateStoreJmespathStr],
   );
@@ -259,6 +257,9 @@ const App: FC = () => {
   }, []);
 
   useEffect(() => {
+    if (isJmespathManuallyUpdatedRef.current) {
+      return;
+    }
     const { state } = jsonEditorRef.current?.view ?? {};
     if (!state) {
       return;
@@ -268,6 +269,7 @@ const App: FC = () => {
       arrayProjection,
     });
     updateStoreJmespathStr(jmespath);
+    isJmespathManuallyUpdatedRef.current = false;
   }, [arrayProjection, updateStoreJmespathStr]);
 
   const [copyResult, setCopyResult] = useState("");

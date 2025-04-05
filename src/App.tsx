@@ -299,7 +299,7 @@ const App: FC = () => {
   }, []);
 
   return (
-    <div className="p flex h-screen flex-col gap-2 p-4">
+    <div className="p flex h-screen min-w-fit flex-col gap-2 p-4">
       <h1 className="shrink-0 text-xl font-bold">🛝 JMESPath Playground</h1>
       <div className="flex shrink-0 items-center gap-4">
         <div className="flex shrink-0 items-center gap-2">
@@ -392,12 +392,14 @@ const App: FC = () => {
         <a
           className="cursor-pointer text-gray-600 underline"
           href="https://github.com/Sec-ant/jmespath-playground"
+          target="_blank"
         >
           GitHub
         </a>
         <a
           className="cursor-pointer text-gray-600 underline"
           href="https://jmespath.org/tutorial.html"
+          target="_blank"
         >
           JMESPath Tutorial
         </a>

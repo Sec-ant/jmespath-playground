@@ -1,7 +1,7 @@
 import { json } from "@codemirror/lang-json";
 import { language } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
-import { keymap, type KeyBinding } from "@codemirror/view";
+import { keymap, type EditorView, type KeyBinding } from "@codemirror/view";
 import { search, type JSONValue } from "@jmespath-community/jmespath";
 import { vscodeLight } from "@uiw/codemirror-theme-vscode";
 import CodeMirror, {
@@ -10,6 +10,7 @@ import CodeMirror, {
   type ReactCodeMirrorRef,
 } from "@uiw/react-codemirror";
 import { jmespath } from "codemirror-lang-jmespath";
+import { jsonrepair } from "jsonrepair";
 import { formatWithCursor, type Plugin } from "prettier";
 import * as prettierPluginBabel from "prettier/plugins/babel";
 import * as prettierPluginEstree from "prettier/plugins/estree";
@@ -50,6 +51,53 @@ const INVALID_JSON = Symbol("INVALID_JSON");
  */
 const INVALID_JMESPATH = Symbol("INVALID_JMESPATH");
 
+function runFormatJson(view?: EditorView) {
+  if (!view) {
+    return false;
+  }
+  const { name: languageName } = view.state.facet(language) ?? {};
+  if (languageName !== "json") {
+    return false;
+  }
+  const source = view.state.doc.toString();
+  const cursorOffset = view.state.selection.main.to;
+  formatWithCursor(source, {
+    parser: "json",
+    cursorOffset,
+    plugins: [prettierPluginBabel, prettierPluginEstree] as Plugin[],
+  })
+    .then(({ formatted, cursorOffset }) => {
+      view.dispatch({
+        changes: { from: 0, to: source.length, insert: formatted },
+        selection: { anchor: cursorOffset, head: cursorOffset },
+      });
+    })
+    .catch(() => {});
+  return true;
+}
+
+function runRepairJson(view?: EditorView) {
+  if (!view) {
+    return false;
+  }
+  const { name: languageName } = view.state.facet(language) ?? {};
+  if (languageName !== "json") {
+    return false;
+  }
+  const source = view.state.doc.toString();
+  try {
+    const repaired = jsonrepair(source);
+    if (repaired !== source) {
+      view.dispatch({
+        changes: { from: 0, to: source.length, insert: repaired },
+      });
+    }
+  } catch {
+    /* void */
+  }
+  return true;
+}
+
 /**
  * Creates keyboard shortcuts for CodeMirror
  * Currently provides Shift-Alt-F for JSON formatting
@@ -59,32 +107,12 @@ const supportedKeymap = () =>
   keymap.of([
     {
       key: "Shift-Alt-f",
-      run: (view) => {
-        const { name: languageName } = view.state.facet(language) ?? {};
-
-        if (languageName !== "json") {
-          return false;
-        }
-
-        const source = view.state.doc.toString();
-
-        const cursorOffset = view.state.selection.main.to;
-
-        formatWithCursor(source, {
-          parser: "json",
-          cursorOffset,
-          plugins: [prettierPluginBabel, prettierPluginEstree] as Plugin[],
-        })
-          .then(({ formatted, cursorOffset }) => {
-            view.dispatch({
-              changes: { from: 0, to: source.length, insert: formatted },
-              selection: { anchor: cursorOffset, head: cursorOffset },
-            });
-          })
-          .catch(() => {});
-
-        return true;
-      },
+      run: runFormatJson,
+      preventDefault: true,
+    },
+    {
+      key: "Mod-.",
+      run: (view) => runRepairJson(view) && runFormatJson(view),
       preventDefault: true,
     },
   ] satisfies KeyBinding[]);
@@ -327,6 +355,13 @@ const App: FC = () => {
     isJmespathManuallyUpdatedRef.current = false;
   }, [arrayProjection, updateStoreJmespathStr]);
 
+  const handleRepairJson = useCallback(() => {
+    return (
+      runRepairJson(jsonEditorRef.current?.view) &&
+      runFormatJson(jsonEditorRef.current?.view)
+    );
+  }, []);
+
   const [copyResult, setCopyResult] = useState("");
 
   const showCopyResultTimeoutRef = useRef(0);
@@ -341,7 +376,7 @@ const App: FC = () => {
    * Creates a shareable URL and copies it to clipboard
    * Shows a success or error message after attempt
    */
-  const copyShareLinkToClipboard = useCallback(() => {
+  const handleCopyShareLink = useCallback(() => {
     navigator.clipboard
       .writeText(window.location.href)
       .then(() => {
@@ -372,10 +407,10 @@ const App: FC = () => {
       ) {
         e.preventDefault();
         e.stopPropagation();
-        copyShareLinkToClipboard();
+        handleCopyShareLink();
       }
     },
-    [copyShareLinkToClipboard],
+    [handleCopyShareLink],
   );
 
   /**
@@ -394,7 +429,7 @@ const App: FC = () => {
   return (
     <div className="p flex h-screen flex-col gap-2 p-4">
       <h1 className="shrink-0 text-xl font-bold">🛝 JMESPath Playground</h1>
-      <div className="flex shrink-0 items-center gap-4">
+      <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-0.5">
         <div className="flex shrink-0 items-center gap-2">
           <input
             className="cursor-pointer"
@@ -434,10 +469,17 @@ const App: FC = () => {
           </select>
         </div>
         <button
-          className="cursor-pointer rounded-sm bg-gray-100 px-2 outline-1 outline-gray-400 transition-colors hover:bg-gray-200 active:bg-gray-300"
-          onClick={copyShareLinkToClipboard}
+          className="rounded-sm bg-gray-100 px-2 text-nowrap outline-1 outline-gray-400 transition-colors not-disabled:cursor-pointer not-disabled:hover:bg-gray-200 not-disabled:active:bg-gray-300 disabled:text-gray-400"
+          disabled={parsedJson !== INVALID_JSON}
+          onClick={handleRepairJson}
         >
-          Share
+          🛠️ Repair
+        </button>
+        <button
+          className="rounded-sm bg-gray-100 px-2 text-nowrap outline-1 outline-gray-400 transition-colors not-disabled:cursor-pointer not-disabled:hover:bg-gray-200 not-disabled:active:bg-gray-300 disabled:text-gray-400"
+          onClick={handleCopyShareLink}
+        >
+          🔗 Share
         </button>
         {showCopyResult && (
           <span className="text-sm text-nowrap">{copyResult}</span>

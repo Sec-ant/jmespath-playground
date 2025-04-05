@@ -20,4 +20,7 @@ export default defineConfig({
     },
   },
   plugins: [react(), tailwindcss(), VitePWA({ registerType: "autoUpdate" })],
+  define: {
+    BUILD_TIME: JSON.stringify(Date.now()),
+  },
 });

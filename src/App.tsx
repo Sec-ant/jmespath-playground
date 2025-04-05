@@ -496,6 +496,17 @@ const App: FC = () => {
         >
           JMESPath Tutorial
         </a>
+        <span className="text-gray-600">
+          Last build:{" "}
+          {new Intl.DateTimeFormat("default", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+          }).format(BUILD_TIME)}
+        </span>
       </div>
     </div>
   );

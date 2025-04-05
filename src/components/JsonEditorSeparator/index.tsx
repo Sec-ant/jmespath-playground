@@ -63,10 +63,10 @@ const JsonEditorSeparator: FC = () => {
   return (
     <>
       <div
-        className="flex h-full w-2 shrink-0 cursor-col-resize items-center justify-center hover:bg-gray-300 hover:mask-y-from-[calc(100%-32px)] hover:mask-y-to-100%"
+        className="flex h-full w-2 shrink-0 cursor-col-resize items-center justify-center hover:bg-gray-300 hover:mask-y-from-[calc(100%-min(32px,10%))] hover:mask-y-to-100%"
         onMouseDown={handleMouseDown}
       >
-        <div className="h-8 w-1 rounded-full bg-gray-400" />
+        <div className="h-[min(32px,100%)] w-1 rounded-full bg-gray-400" />
       </div>
       {isDragging &&
         createPortal(

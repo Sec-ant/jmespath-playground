@@ -476,8 +476,8 @@ const App: FC = () => {
             />
           </div>
           <JmespathEditorSeparator />
-          <div className="min-h-[100px] grow overflow-auto rounded-md bg-gray-100 p-2">
-            {queriedJsonView}
+          <div className="flex min-h-fit grow flex-col overflow-x-auto rounded-md bg-gray-100 p-2">
+            <div className="min-h-[100px]">{queriedJsonView}</div>
           </div>
         </div>
       </div>

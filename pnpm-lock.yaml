@@ -21,8 +21,8 @@ importers:
         specifier: ^6.36.5
         version: 6.36.6
       '@eslint/json':
-        specifier: ^0.11.0
-        version: 0.11.0
+        specifier: ^0.12.0
+        version: 0.12.0
       '@jmespath-community/jmespath':
         specifier: ^1.1.5
         version: 1.1.5
@@ -932,8 +932,8 @@ packages:
     resolution: {integrity: sha512-dEIwmjntEx8u3Uvv+kr3PDeeArL8Hw07H9kyYxCjnM9pBjfEhk6uLXSchxxzgiwtRhhzVzqmUSDFBOi1TuZ7qg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/json@0.11.0':
-    resolution: {integrity: sha512-XSrJBMuDEP0/XgLJ/CfQc6otytZt56l/n2SCjk8qGgaw311F/aKvdCqAgXKzsBTlxi1MlM/F3K8H2e1TEBbmCA==}
+  '@eslint/json@0.12.0':
+    resolution: {integrity: sha512-n/7dz8HFStpEe4o5eYk0tdkBdGUS/ZGb0GQCeDWN1ZmRq67HMHK4vC33b0rQlTT6xdZoX935P4vstiWVk5Ying==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@eslint/object-schema@2.1.6':
@@ -4006,7 +4006,7 @@ snapshots:
 
   '@eslint/js@9.25.1': {}
 
-  '@eslint/json@0.11.0':
+  '@eslint/json@0.12.0':
     dependencies:
       '@eslint/core': 0.12.0
       '@eslint/plugin-kit': 0.2.8

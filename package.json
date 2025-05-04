@@ -24,7 +24,7 @@
     "@tailwindcss/vite": "^4.1.3",
     "@uiw/codemirror-theme-vscode": "^4.23.10",
     "@uiw/react-codemirror": "^4.23.10",
-    "@uiw/react-json-view": "2.0.0-alpha.30",
+    "@uiw/react-json-view": "2.0.0-alpha.32",
     "codemirror-lang-jmespath": "^1.0.3",
     "core-js": "^3.41.0",
     "eslint-linter-browserify": "^9.24.0",

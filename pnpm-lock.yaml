@@ -42,8 +42,8 @@ importers:
         specifier: ^4.23.10
         version: 4.23.11(@babel/runtime@7.27.0)(@codemirror/autocomplete@6.18.6)(@codemirror/language@6.11.0)(@codemirror/lint@6.8.5)(@codemirror/search@6.5.10)(@codemirror/state@6.5.2)(@codemirror/theme-one-dark@6.1.2)(@codemirror/view@6.36.6)(codemirror@6.0.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@uiw/react-json-view':
-        specifier: 2.0.0-alpha.30
-        version: 2.0.0-alpha.30(@babel/runtime@7.27.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: 2.0.0-alpha.32
+        version: 2.0.0-alpha.32(@babel/runtime@7.27.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       codemirror-lang-jmespath:
         specifier: ^1.0.3
         version: 1.0.3
@@ -1382,8 +1382,8 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
-  '@uiw/react-json-view@2.0.0-alpha.30':
-    resolution: {integrity: sha512-ufvvirUQcITU9s4R12b7hn/t7ngLCYp1KbBxE+eAD35o3Ey+uxfKvgWmIwGFhV3hFXXxMJ8SHQKwl/ywNCHsDA==}
+  '@uiw/react-json-view@2.0.0-alpha.32':
+    resolution: {integrity: sha512-pGWaJLsc9vO0vOLHmffpKz5L5bOJLX+lfeLC32hXJfd6FSDjLD8LwSUyRLyFeYHezA8iFafvF2Vwm5+jADRrCw==}
     peerDependencies:
       '@babel/runtime': '>=7.10.0'
       react: '>=18.0.0'
@@ -4432,7 +4432,7 @@ snapshots:
       - '@codemirror/lint'
       - '@codemirror/search'
 
-  '@uiw/react-json-view@2.0.0-alpha.30(@babel/runtime@7.27.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@uiw/react-json-view@2.0.0-alpha.32(@babel/runtime@7.27.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@babel/runtime': 7.27.0
       react: 19.1.0
